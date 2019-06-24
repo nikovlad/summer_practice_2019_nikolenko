@@ -1,0 +1,263 @@
+/**
+*@file lp_nikolenko.c
+*@author Ќиколенко ¬. . , гр. 515¬ , вариант 14
+*@date создани€: 23.06.2019
+*@brief «адание на летнюю практику 2019 года 1 курс
+* ѕеревод целого 32-битного знакового числа в текст на украинском
+*/
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <conio.h>
+#include <locale.h>
+#include <ctype.h> 
+/*
+* ѕеревод целого 32-битного знакового числа в текст на украинском
+* @param number день рождени€
+* @param *s мес€ц рождени€
+*/
+void numbers_to_words(int number, char *s);
+
+int main()
+{
+	setlocale(LC_ALL, "Rus");
+	printf("*--------------------------------------------*\n| ѕеревод целого числа в текст на украинском |\n*--------------------------------------------*\n\n");
+	int res = 0;
+	long long int number;
+reinput:
+	do 
+	{
+		printf("¬ведите числовое значение в диапазоне 32-битного знакового числа :");
+		res = scanf_s("%llu", &number);
+		if (res == 0)
+			printf("ќшибка ! ¬ы ввели символьное значение .\n");
+		while (getchar() != '\n');
+	} while (res != 1);
+	if (number > LONG_MAX || number < LONG_MIN)
+	{
+		printf("¬ы ввели значение , которое не выходит в диапазон 32-битного знакового числа\n");
+		goto reinput;
+	}
+	char string[120];
+	printf("%d ----> ", number);
+	if (number == 0)
+	{
+		printf(" ноль \n");
+		_getch();
+		return 1;
+	}
+	string[0] = '\0';
+	numbers_to_words(number, string);
+	printf("%s\n", string);
+	_getch();
+	return 0;
+}
+
+void numbers_to_words(int number, char *s) {
+	if (number < 0)
+	{
+		number *= -1;
+		printf("мiнус ");
+	}
+	int position = 0, div = 1000000000, chastnoe = number, remainder; // позици€ в строке дл€ записи, определение разр€дов , частное и остаток от делени€
+	int number_position[10]; // разр€ды 
+	for (int i = 0; i < 10; i++)
+	{
+		remainder = (int)(chastnoe / div);
+		number_position[i] = remainder;
+		chastnoe = chastnoe - remainder * div;
+		div = div / 10;
+	}
+	// мiль€рди
+	switch (number_position[0])
+	{
+	case 1: strcpy(s, "один мiль€рд "); break;
+	case 2: strcpy(s, "два мiль€рди "); break;
+	default:break;
+	}
+	position = strlen(s);
+	// мiльйони
+	switch (number_position[1])
+	{
+	case 1: strcpy(s + position, "сто "); break;
+	case 2: strcpy(s + position, "двiсти "); break;
+	case 3: strcpy(s + position, "триста "); break;
+	case 4: strcpy(s + position, "чотириста "); break;
+	case 5: strcpy(s + position, "п`€тсот "); break;
+	case 6: strcpy(s + position, "шiстсот "); break;
+	case 7: strcpy(s + position, "сiмсот "); break;
+	case 8: strcpy(s + position, "вiсiмсот "); break;
+	case 9: strcpy(s + position, "дев`€тьсот "); break;
+	default: break;
+	}
+	position = strlen(s);
+	switch (number_position[2])
+	{
+	case 1:
+		// „исла от 10kk до 19kk
+		switch (number_position[3])
+		{
+		case 0: strcpy(s + position, "дес€ть мiльйонiв "); break;
+		case 1: strcpy(s + position, "одинадц€ть мiльйонiв "); break;
+		case 2: strcpy(s + position, "дванадц€ть мiльйонiв "); break;
+		case 3: strcpy(s + position, "тринадц€ть мiльйонiв "); break;
+		case 4: strcpy(s + position, "чотирнадц€ть мiльйонiв "); break;
+		case 5: strcpy(s + position, "п`€тнадц€ть мiльйонiв "); break;
+		case 6: strcpy(s + position, "шiстнадц€ть мiльйонiв "); break;
+		case 7: strcpy(s + position, "сiмнадц€ть мiльйонiв "); break;
+		case 8: strcpy(s + position, "вiсiмнадц€ть мiльйонiв "); break;
+		case 9: strcpy(s + position, "дев`€тнадц€ть мiльйонiв "); break;
+		}
+		number_position[3] = -1;
+		position = strlen(s);
+		break;
+	case 2: strcpy(s + position, "двадц€ть "); break;
+	case 3: strcpy(s + position, "тридц€ть "); break;
+	case 4: strcpy(s + position, "сорок "); break;
+	case 5: strcpy(s + position, "п`€тдес€т "); break;
+	case 6: strcpy(s + position, "шiстдес€т "); break;
+	case 7: strcpy(s + position, "сiмдес€т "); break;
+	case 8: strcpy(s + position, "вiсiмдес€т "); break;
+	case 9: strcpy(s + position, "дев`€носто "); break;
+	default: break;
+	}
+	position = strlen(s);
+	switch (number_position[3])
+	{
+	case 0: if (number_position[2] || number_position[1])strcpy(s + position, "мiльйонiв "); break;
+	case 1: strcpy(s + position, "один мiльйон "); break;
+	case 2: strcpy(s + position, "два мiльйони "); break;
+	case 3: strcpy(s + position, "три мiльйони"); break;
+	case 4: strcpy(s + position, "чотири мiльйони "); break;
+	case 5: strcpy(s + position, "п`€ть мiльйонiв "); break;
+	case 6: strcpy(s + position, "шiсть мiльйонiв "); break;
+	case 7: strcpy(s + position, "сiм мiльйонiв "); break;
+	case 8: strcpy(s + position, "вiсiм мiльйонiв "); break;
+	case 9: strcpy(s + position, "дев`€ть мiльйонiв "); break;
+	default: break;
+	}
+	position = strlen(s);
+	//тис€чи
+	switch (number_position[4])
+	{
+	case 1: strcpy(s + position, "сто "); break;
+	case 2: strcpy(s + position, "двiсти "); break;
+	case 3: strcpy(s + position, "триста "); break;
+	case 4: strcpy(s + position, "чотириста "); break;
+	case 5: strcpy(s + position, "п`€тсот "); break;
+	case 6: strcpy(s + position, "шiстсот "); break;
+	case 7: strcpy(s + position, "сiмсот "); break;
+	case 8: strcpy(s + position, "вiсiмсот "); break;
+	case 9: strcpy(s + position, "дев`€тьсот "); break;
+	default: break;
+	}
+	position = strlen(s);
+	switch (number_position[5])
+	{
+	case 1:
+		// „исла от 10k до 19k
+		switch (number_position[6])
+		{
+		case 0: strcpy(s + position, "дес€ть тис€ч "); break;
+		case 1: strcpy(s + position, "одинадц€ть тис€ч "); break;
+		case 2: strcpy(s + position, "дванадц€ть тис€ч "); break;
+		case 3: strcpy(s + position, "тринадц€ть тис€ч "); break;
+		case 4: strcpy(s + position, "чотирнадц€ть тис€ч "); break;
+		case 5: strcpy(s + position, "п`€тнадц€ть тис€ч "); break;
+		case 6: strcpy(s + position, "шiстнадц€ть тис€ч "); break;
+		case 7: strcpy(s + position, "сiмнадц€ть тис€ч "); break;
+		case 8: strcpy(s + position, "вiсiмнадц€ть тис€ч "); break;
+		case 9: strcpy(s + position, "дев`€тнадц€ть тис€ч "); break;
+		}
+		number_position[6] = -1;
+		position = strlen(s);
+		break;
+	case 2: strcpy(s + position, "двадц€ть "); break;
+	case 3: strcpy(s + position, "тридц€ть "); break;
+	case 4: strcpy(s + position, "сорок "); break;
+	case 5: strcpy(s + position, "п`€тьдес€т "); break;
+	case 6: strcpy(s + position, "шiстьдес€т "); break;
+	case 7: strcpy(s + position, "сiмдес€т "); break;
+	case 8: strcpy(s + position, "вiсiмдес€т "); break;
+	case 9: strcpy(s + position, "дев`€носто "); break;
+	default: break;
+	}
+	position = strlen(s);
+	switch (number_position[6])
+	{
+	case 0: if (number_position[5] || number_position[4])strcpy(s + position, "тис€ч "); break;
+	case 1: strcpy(s + position, "одна тис€ча "); break;
+	case 2: strcpy(s + position, "двi тис€чi "); break;
+	case 3: strcpy(s + position, "три тис€чi "); break;
+	case 4: strcpy(s + position, "чотири тис€чi "); break;
+	case 5: strcpy(s + position, "п`€ть тис€ч "); break;
+	case 6: strcpy(s + position, "шiсть тис€ч "); break;
+	case 7: strcpy(s + position, "сiм тис€ч "); break;
+	case 8: strcpy(s + position, "вiсiм тис€ч "); break;
+	case 9: strcpy(s + position, "дев`€ть тис€ч "); break;
+	default: break;
+	}
+	position = strlen(s);
+	// —отни
+	switch (number_position[7])
+	{
+	case 1: strcpy(s + position, "сто "); break;
+	case 2: strcpy(s + position, "двiстi "); break;
+	case 3: strcpy(s + position, "триста "); break;
+	case 4: strcpy(s + position, "чотириста "); break;
+	case 5: strcpy(s + position, "п`€тсот "); break;
+	case 6: strcpy(s + position, "шiстсот "); break;
+	case 7: strcpy(s + position, "сiмсот "); break;
+	case 8: strcpy(s + position, "вiсiмсот "); break;
+	case 9: strcpy(s + position, "дев`€тьсот "); break;
+	default: break;
+	}
+	position = strlen(s);
+	// ƒес€тки
+	switch (number_position[8])
+	{
+	case 1:
+		// „исла от 10 до 19
+		switch (number_position[9])
+		{
+		case 0: strcpy(s + position, "дес€ть "); break;
+		case 1: strcpy(s + position, "одинадц€ть "); break;
+		case 2: strcpy(s + position, "дванадц€ть "); break;
+		case 3: strcpy(s + position, "тринадц€ть "); break;
+		case 4: strcpy(s + position, "чотирнадц€ть "); break;
+		case 5: strcpy(s + position, "п`€тнадц€ть "); break;
+		case 6: strcpy(s + position, "шiстнадц€ть "); break;
+		case 7: strcpy(s + position, "сiмнадц€ть "); break;
+		case 8: strcpy(s + position, "вiсiмнадц€ть "); break;
+		case 9: strcpy(s + position, "дев`€тнадц€ть "); break;
+		}
+		number_position[9] = 0;
+		position = strlen(s);
+		break;
+	case 2: strcpy(s + position, "двадц€ть "); break;
+	case 3: strcpy(s + position, "тридц€ть "); break;
+	case 4: strcpy(s + position, "сорок "); break;
+	case 5: strcpy(s + position, "п`€тьдес€т "); break;
+	case 6: strcpy(s + position, "шiстьдес€т "); break;
+	case 7: strcpy(s + position, "сiмдес€т "); break;
+	case 8: strcpy(s + position, "вiсiмдес€т "); break;
+	case 9: strcpy(s + position, "дев`€носто "); break;
+	default: break;
+	}
+	position = strlen(s);
+	// ≈диницы
+	switch (number_position[9]) {
+	case 1: strcpy(s + position, "один "); break;
+	case 2: strcpy(s + position, "два "); break;
+	case 3: strcpy(s + position, "три "); break;
+	case 4: strcpy(s + position, "чотири "); break;
+	case 5: strcpy(s + position, "п`€ть "); break;
+	case 6: strcpy(s + position, "шiсть "); break;
+	case 7: strcpy(s + position, "сiм "); break;
+	case 8: strcpy(s + position, "вiсiм "); break;
+	case 9: strcpy(s + position, "дев`€ть "); break;
+	default: break;
+	}
+	position = strlen(s);
+}
